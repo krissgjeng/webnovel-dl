@@ -1,0 +1,17 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run compile",
+            "type": "shell",
+            "command": "./scripts/test.sh",
+            "windows": {
+              "command": ".\\scripts\\compile.cmd"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+          }
+    ]
+}
