@@ -1,6 +1,6 @@
 #include "tidywrapper.h"
-#include <tidy.h>
-#include <tidybuffio.h>
+#include <tidy/tidy.h> //fix this on windows
+#include <tidy/tidybuffio.h>
 #include <stdio.h>
 #include <errno.h>
 #include <sstream>

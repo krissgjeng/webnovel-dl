@@ -4,7 +4,7 @@
         {
             "label": "Run compile",
             "type": "shell",
-            "command": "./scripts/test.sh",
+            "command": "./scripts/compile.sh",
             "windows": {
               "command": ".\\scripts\\compile.cmd"
             },
