@@ -1,20 +1,81 @@
 #include <iostream>
+#include <fstream>
 #include <string>
+#include <filesystem>
 #include "tidywrapper.h"
+#include "curlwrapper.h"
+#include "stringhelper.h"
+#include "royalroadget.h"
+#include "console.h"
 //using https://code.visualstudio.com/docs/cpp/config-mingw
 //
-int main() {
-    printf("test tidy");
-    std::cout << "Hello World!" << std::endl;
-    std::cout << "Hello World!" << std::endl;
+std::string url="";
+int ch=1;
+
+bool parseArgs(int argc, char *argv[])
+{
+    if(argc<=1)
+    {
+        Console::WriteLine("no args enter url and chapter, example .\\main.exe https://www.royalroad.com/fiction/34473/shade-touched 1");
+        return false;
+    }
+    /*std::cout << "You have entered " << argc-1
+         << " arguments:" << "\n"; 
+  
+    for (int i = 1; i < argc; ++i) 
+        std::cout << argv[i] << "\n";*/
+        if(argc==3)
+        {
+            url = argv[1];
+            ch = std::stoi(argv[2]);
+            Console::WriteLine("url = "+url+" ch="+std::to_string(ch));
+            return true;
+        }
+        else if(argc==2)
+        {
+            url = argv[1];
+            Console::WriteLine("url = "+url+" ch=All");
+            return true;
+        }
+        else return false;
+
+
+}
+
+bool writeToFile(std::string &content, int mych=-1)
+{
+    if(mych==-1) mych=ch;
+    //std::string filepath= std::filesystem::current_path().string()+"/"+std::to_string(ch)+".xhtml";
+    std::ofstream myfile;
+    myfile.open(std::to_string(mych)+".xhtml");
+    myfile << content;
+    myfile.close();
+    return true;
+}
+
+int main(int argc, char *argv[]) 
+{
+    if(parseArgs(argc, argv)==false) return 1;
+    //printf("test tidy");
+    //std::cout << "Hello World!" << std::endl;
+    //std::string url="https://www.royalroad.com/fiction/34473/shade-touched";
+    //int ch=1;
 
     TidyWrapper td;
-    std::string xhtml = td.tidyhtmlToXHtml("<html><body><p>test</p><br><br><p>test2</p></body></html>");
+    //std::string xhtml = td.tidyhtmlToXHtml("<html><body><p>test</p><br><br><p>test2</p></body></html>");
+    //std::cout << xhtml;
 
-    std::cout << xhtml;
-    /*
-    int number;
-    std::cin >> number;
-    std::cout << number;*/
+    RoyalRoadGet rrg(url);
+    rrg.getAllCh([](int chi, std::string ch){
+        writeToFile(ch,chi);
+    });
+    //std::string chapter = rrg.getCh(ch);
+    //std::string xhtmlcontent = td.tidyhtmlToXHtml(chapter);
+    //StringHelper::replace(xhtmlcontent, "<body>", "<body>\n<h2>Chapter "+std::to_string(ch)+"</h2><br />");
+    //Console::WriteLine("---break---");
+    //Console::WriteLine(xhtmlcontent);
+
+    //writeToFile(xhtmlcontent);
+
     return 0;
 }
