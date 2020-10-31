@@ -7,6 +7,7 @@
 #include "stringhelper.h"
 #include "royalroadget.h"
 #include "console.h"
+#include "zipwrapper.h"
 //using https://code.visualstudio.com/docs/cpp/config-mingw
 //
 std::string url="";
