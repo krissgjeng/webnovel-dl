@@ -52,10 +52,13 @@ bool writeToFile(std::string &content, int mych=-1)
 {
     if(mych==-1) mych=ch;
     //std::string filepath= std::filesystem::current_path().string()+"/"+std::to_string(ch)+".xhtml";
+    std::string fname = std::to_string(mych)+".xhtml";
     std::ofstream myfile;
-    myfile.open(std::to_string(mych)+".xhtml");
+    myfile.open(fname);
     myfile << content;
     myfile.close();
+    ZipWrapper::zip_append_file(fname,"test.zip");
+    
     return true;
 }
 
@@ -70,7 +73,7 @@ int main(int argc, char *argv[])
     TidyWrapper td;
     //std::string xhtml = td.tidyhtmlToXHtml("<html><body><p>test</p><br><br><p>test2</p></body></html>");
     //std::cout << xhtml;
-
+    std::string chp="";
     RoyalRoadGet rrg(url);
     switch (currentjob)
     {
@@ -80,7 +83,9 @@ int main(int argc, char *argv[])
         });
         break;
         case job::getch:
-            std::cout << rrg.getCh(ch)<<std::endl;
+            chp = rrg.getCh(ch);
+            std::cout << chp <<std::endl;
+            writeToFile(chp,ch);
         break;
     default:
         break;
