@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+class RoyalRoadGet;
+
 class MakeEpub
 {
 public:
@@ -16,12 +18,13 @@ private:
     int chfrom;
     int chto;
     int chapters;
+    RoyalRoadGet* rrg=nullptr;
     void prepareStructure();
     void downloadChapters(std::string url, int from=1, int to=-1);
     void convertToXhtml();
     void createToc();
     void compressContent();
+    void cleanup();
     
-
 };
 #endif // MAKEEPUB_H

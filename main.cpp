@@ -46,8 +46,6 @@ bool parseArgs(int argc, char *argv[])
             return true;
         }
         else return false;
-
-
 }
 
 bool writeToFile(std::string &content, int mych=-1)
@@ -59,14 +57,6 @@ bool writeToFile(std::string &content, int mych=-1)
     myfile.open(fname);
     myfile << content;
     myfile.close();
-    //std::fstream myfile2;
-    //myfile2.open(fname);
-    //std::stringstream contentss;
-    //contentss << myfile2.rdbuf();
-    //Console::WriteLine("content");
-    //Console::WriteLine( std::to_string(contentss.str().length()));
-    //Console::WriteLine(contentss.str());
-    //ZipWrapper::zip_append_file(fname,"test.zip");
     
     return true;
 }
@@ -74,14 +64,8 @@ bool writeToFile(std::string &content, int mych=-1)
 int main(int argc, char *argv[]) 
 {
     if(parseArgs(argc, argv)==false) return 1;
-    //printf("test tidy");
     //std::cout << "Hello World!" << std::endl;
     //std::string url="https://www.royalroad.com/fiction/34473/shade-touched";
-    //int ch=1;
-    //std::string html;
-    TidyWrapper td;
-    //std::string xhtml = td.tidyhtmlToXHtml("<html><body><p>test</p><br><br><p>test2</p></body></html>");
-    //std::cout << xhtml;
     std::string chp="";
     RoyalRoadGet rrg(url);
     MakeEpub epub("epub");
@@ -104,11 +88,8 @@ int main(int argc, char *argv[])
         break;
     }
     
-    //std::string xhtmlcontent = td.tidyhtmlToXHtml(chapter);
-    //StringHelper::replace(xhtmlcontent, "<body>", "<body>\n<h2>Chapter "+std::to_string(ch)+"</h2><br />");
     //Console::WriteLine("---break---");
     //Console::WriteLine(xhtmlcontent);
-
     //writeToFile(xhtmlcontent);
 
     return 0;

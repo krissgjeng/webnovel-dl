@@ -11,7 +11,6 @@
 #include <chrono>
 #include <thread>
 
-
 MakeEpub::MakeEpub(std::string outputdir)
 {
     outDir = outputdir;
@@ -19,15 +18,18 @@ MakeEpub::MakeEpub(std::string outputdir)
     tmpDir = outputdir+"/tmp";
     std::filesystem::create_directories(workDir);
     std::filesystem::create_directory(tmpDir);
-
 }
 void MakeEpub::BuildEpub(std::string url)
 {
+    rrg = new RoyalRoadGet(url);
     prepareStructure();
     downloadChapters(url);
     convertToXhtml();
     createToc();
     compressContent();
+    cleanup();
+    delete rrg;
+    rrg=nullptr;
 }
 
 void MakeEpub::prepareStructure()
@@ -42,8 +44,8 @@ void MakeEpub::prepareStructure()
 }
 void MakeEpub::downloadChapters(std::string url, int from, int to)
 {
-    RoyalRoadGet rrg(url);
-    int c = rrg.GetChCount();
+    int delayinms=750;
+    int c = rrg->GetChCount();
     Console::WriteLine("chps: "+std::to_string(c));
     if(to==-1) to =c;
     chfrom = from; chto = to;
@@ -54,10 +56,10 @@ void MakeEpub::downloadChapters(std::string url, int from, int to)
         std::ofstream ch;
         ch.open( tmpDir+"/"+std::to_string(i)+".html" );
         htmlfiles.push_back(tmpDir+"/"+std::to_string(i)+".html");
-        ch << rrg.getCh(i);
+        ch << rrg->getCh(i);
         ch.close();
         Console::WriteLine("dl ch: "+std::to_string(i)+"/"+std::to_string(to));
-        std::this_thread::sleep_for(std::chrono::milliseconds(1500)); //delay for preventing flooding of server and getting banned
+        std::this_thread::sleep_for(std::chrono::milliseconds(delayinms)); //delay for preventing flooding of server and getting banned
     }
 }
 void MakeEpub::convertToXhtml()
@@ -74,7 +76,8 @@ void MakeEpub::convertToXhtml()
         contentss << chh.rdbuf();
         chh.close();
         std::string xhtml = td.tidyhtmlToXHtml(contentss.str());
-        StringHelper::replace(xhtml, "<body>", "<body>\n<h2>Chapter "+std::to_string(i+1)+"</h2><br />");
+        if(i==0) StringHelper::replace(xhtml, "<body>", "<body>\n<h1>"+rrg->Title+"</h1>\n<h4>by "+rrg->Author+"</h4><h2>Chapter "+std::to_string(i+1)+"</h2><br />");
+        else StringHelper::replace(xhtml, "<body>", "<body>\n<h2>Chapter "+std::to_string(i+1)+"</h2><br />");
         chx << xhtml;
         chx.close();
     }
@@ -83,8 +86,10 @@ void MakeEpub::createToc()
 {
     using std::string, std::ofstream;
 
-    string name="royalorad";
-    string author="royalorad";
+    string name=rrg->Title;
+    string author=rrg->Author;
+    string publisher = "Royal Road";// "WebNovelReader";
+
     string containerxml = "<?xml version=\"1.0\"?>\r\n\
                            <container version=\"1.0\" xmlns=\"urn:oasis:names:tc:opendocument:xmlns:container\">\r\n\
                            \t<rootfiles>\r\n\
@@ -105,7 +110,7 @@ void MakeEpub::createToc()
                     <dc:creator opf:role=\"aut\">"+author+"</dc:creator>\n\
                     <dc:language>en-US</dc:language>\n\
                     <dc:rights>Public Domain</dc:rights>\n\
-                    <dc:publisher>WebNovelReader</dc:publisher>\n\
+                    <dc:publisher>"+publisher+"</dc:publisher>\n\
                     <dc:identifier id=\"BookID\">"+uuid+"</dc:identifier>\n\
                 </metadata>\n\
                 <manifest>\n\
@@ -156,10 +161,16 @@ void MakeEpub::createToc()
 void MakeEpub::compressContent()
 {
     using std::string;
-    string output = outDir+"/output.epub";
+    string output = outDir+"/"+rrg->Title+"_"+std::to_string(chfrom)+"-"+std::to_string(chto)+".epub";
     ZipWrapper zw;
 
     zw.zip_append_file_store(workDir+"/mimetype","mimetype",output);
     std::filesystem::remove(workDir+"/mimetype");
     zw.zip_directory(workDir,output);
+}
+void MakeEpub::cleanup()
+{
+    std::filesystem::remove_all(tmpDir);
+    std::filesystem::remove_all(workDir);
+    htmlfiles.clear();
 }

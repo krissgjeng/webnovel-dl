@@ -10,6 +10,24 @@
 RoyalRoadGet::RoyalRoadGet(std::string url)
 {
     this->url = url;
+    getChUrl(1); //inits stuff
+}
+
+std::string RoyalRoadGet::getAuthor(const std::string& source)
+{
+    using std::string;
+    StringHelper str;
+    string authsrc = str.Get(source, "<h4", "</h4>");
+    authsrc = str.Get(authsrc,"<a href=","/a>");
+    authsrc = str.Get(authsrc,">","<");
+    return authsrc.substr(1);
+}
+std::string RoyalRoadGet::getTitle(const std::string& source)
+{
+    using std::string;
+    StringHelper str;
+    string titlesrc = str.Get(source, "<h1", "/h1>");
+    return str.Get(titlesrc, ">","<").substr(1);
 }
 
 std::string RoyalRoadGet::getChUrl(int ch)
@@ -21,6 +39,8 @@ std::string RoyalRoadGet::getChUrl(int ch)
         StringHelper str;
 
         string source = curl.getSource(url);
+        Author = getAuthor(source);
+        Title = getTitle(source);
         string chaps = str.Get(source, "<tbody>", "</tbody>");
 
         chapters = str.GetAll(chaps, "href", "\">");

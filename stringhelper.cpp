@@ -5,10 +5,10 @@ StringHelper::StringHelper()
 {
 }
 
-std::string StringHelper::Get(std::string &source, const std::string &startstr, const std::string &endstr, bool inclusive)
+std::string StringHelper::Get(const std::string &source, const std::string &startstr, const std::string &endstr, bool inclusive)
 {
     int start = source.find(startstr);
-    int end = source.find(endstr, start) - start;
+    int end = source.find(endstr, start+startstr.length()) - start;
     if (inclusive)
         end += endstr.length();
     return source.substr(start, end);
