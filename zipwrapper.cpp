@@ -64,7 +64,7 @@ static void walk_directory(const std::string &startdir, const std::string &input
 void ZipWrapper::zip_directory(const std::string &inputdir, const std::string &output_filename)
 {
     int errorp;
-    zip_t *zipper = zip_open(output_filename.c_str(), ZIP_CREATE | ZIP_EXCL, &errorp);
+    zip_t *zipper = zip_open(output_filename.c_str(), ZIP_CREATE, &errorp);
     if (zipper == nullptr)
     {
         zip_error_t ziperror;
@@ -124,6 +124,28 @@ void ZipWrapper::zip_append_file(const std::string &inputfile, const std::string
     }
     auto filename = std::filesystem::path(inputfile).stem().string()+std::filesystem::path(inputfile).extension().string();
     if (zip_file_add(zipper, filename.c_str(), source, ZIP_FL_ENC_UTF_8) < 0)
+    {
+        zip_source_free(source);
+        throw std::runtime_error("Failed to add file to zip: " + std::string(zip_strerror(zipper)));
+    }
+    zip_close(zipper);
+}
+void ZipWrapper::zip_append_file_store(const std::string &inputfile, const std::string &internalfilepath, const std::string &output_filename)
+{
+    int errorp;
+    zip_t *zipper = zip_open(output_filename.c_str(), ZIP_CREATE, &errorp);
+    if (zipper == nullptr)
+    {
+        zip_error_t ziperror;
+        zip_error_init_with_code(&ziperror, errorp);
+        throw std::runtime_error("Failed to open output file " + output_filename + ": " + zip_error_strerror(&ziperror));
+    }
+    zip_source_t *source = zip_source_file(zipper, inputfile.c_str(), 0, 0);
+    if (source == nullptr)
+    {
+        throw std::runtime_error("Failed to add file to zip: " + std::string(zip_strerror(zipper)));
+    }
+    if (zip_file_add(zipper, internalfilepath.c_str(), source, ZIP_FL_ENC_UTF_8) < 0)
     {
         zip_source_free(source);
         throw std::runtime_error("Failed to add file to zip: " + std::string(zip_strerror(zipper)));

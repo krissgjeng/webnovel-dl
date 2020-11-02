@@ -8,7 +8,7 @@
             "name": "g++.exe - Build and debug active file",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${fileDirname}\\build\\${fileBasenameNoExtension}.exe",
+            "program": "${workspaceFolder}\\build\\main.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -24,6 +24,14 @@
                 }
             ],
             "preLaunchTask": "Run compile"
+        },
+        {
+            "name": "build and execute",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "${workspaceFolder}\\build\\main.exe",
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Run compile",
         }
     ]
 }

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <sstream>
 #include <filesystem>
 #include "tidywrapper.h"
 #include "curlwrapper.h"
@@ -8,6 +9,7 @@
 #include "royalroadget.h"
 #include "console.h"
 #include "zipwrapper.h"
+#include "makeepub.h"
 //using https://code.visualstudio.com/docs/cpp/config-mingw
 //
 std::string url="";
@@ -19,7 +21,7 @@ bool parseArgs(int argc, char *argv[])
 {
     if(argc<=1)
     {
-        Console::WriteLine("no args enter url and chapter, example .\\main.exe https://www.royalroad.com/fiction/34473/shade-touched 1");
+        Console::WriteLine("no args, enter url and chapter, example .\\main.exe https://www.royalroad.com/fiction/34473/shade-touched 1");
         currentjob=job::none;
         return false;
     }
@@ -57,7 +59,14 @@ bool writeToFile(std::string &content, int mych=-1)
     myfile.open(fname);
     myfile << content;
     myfile.close();
-    ZipWrapper::zip_append_file(fname,"test.zip");
+    //std::fstream myfile2;
+    //myfile2.open(fname);
+    //std::stringstream contentss;
+    //contentss << myfile2.rdbuf();
+    //Console::WriteLine("content");
+    //Console::WriteLine( std::to_string(contentss.str().length()));
+    //Console::WriteLine(contentss.str());
+    //ZipWrapper::zip_append_file(fname,"test.zip");
     
     return true;
 }
@@ -75,16 +84,20 @@ int main(int argc, char *argv[])
     //std::cout << xhtml;
     std::string chp="";
     RoyalRoadGet rrg(url);
+    MakeEpub epub("epub");
+
     switch (currentjob)
     {
     case job::getall:
-        rrg.getAllCh([](int chi, std::string ch){
-            writeToFile(ch,chi);
-        });
+        //rrg.getAllCh([](int chi, std::string ch){
+        //    writeToFile(ch,chi);
+
+        //});
+        epub.BuildEpub(url);
         break;
         case job::getch:
             chp = rrg.getCh(ch);
-            std::cout << chp <<std::endl;
+            //std::cout << chp <<std::endl;
             writeToFile(chp,ch);
         break;
     default:

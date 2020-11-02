@@ -9,6 +9,7 @@ class RoyalRoadGet
 public:
     RoyalRoadGet(std::string url);
     std::string getCh(int ch);
+    int GetChCount();
     std::vector<std::string> getAllCh(std::function<void(int,std::string)> callback=[](int,std::string){},int delayinms=2000);
 private:
     std::string getChUrl(int ch);

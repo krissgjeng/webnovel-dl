@@ -1,5 +1,6 @@
 #include "royalroadget.h"
 #include <vector>
+#define _GLIBCXX_HAS_GTHREADS
 #include <chrono>
 #include <thread>
 #include "curlwrapper.h"
@@ -48,6 +49,11 @@ std::string RoyalRoadGet::getCh(int ch)
     }
     else 
         return "";
+}
+int RoyalRoadGet::GetChCount()
+{
+    getChUrl(1);
+    return chapters.size();
 }
 std::vector<std::string> RoyalRoadGet::getAllCh(std::function<void(int,std::string)> callback, int delayinms)
 {
