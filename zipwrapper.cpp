@@ -1,8 +1,11 @@
 #include "zipwrapper.h"
 #include <iostream>
 #include <string>
-
+#ifdef __linux__
+#include <dirent.h>
+#else
 #include "dirent.h"
+#endif
 #include <sys/stat.h>
 #include <errno.h>
 #include <string.h>
