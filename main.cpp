@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
     }
     
     //Console::WriteLine("---break---");
-    //Console::WriteLine(xhtmlcontent);
+    Console::WriteLine("Done\n");
     //writeToFile(xhtmlcontent);
 
     return 0;
