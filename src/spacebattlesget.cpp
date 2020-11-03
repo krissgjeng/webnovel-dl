@@ -79,7 +79,23 @@ std::string SpaceBattlesGet::getCh(int ch)
     int page = (ch-1)/10;
     string site = this->url + (page==0 ? "" : "/page-"+std::to_string(page+1));
     site = getChUrl(ch, site);
-    return pagehtml.second;
+    string source = pagehtml.second;
+
+    /* reform
+    if(chapter<=0) chapter=currentProgress.currentChapter;
+    int page = (chapter-1) / 10;
+    int pagepart = (chapter-1) % 10;
+    int chlistlenght=-1;
+    if (chapterBuffer == QPair<int, QList<QString>>() || page != chapterBuffer.first)
+    {
+        auto chlist = StringHelper::GetAllInstances(pagehtml.second, "<article class=\"message-body js-selectToQuote\">", "</article>");
+        chlistlenght=chlist.length();
+        qDebug() << "page htmlsecond_length: " << pagehtml.second.length() << " - chlist length: " << chlist.length();
+        chapterBuffer = QPair<int, QList<QString>>(page, chlist);
+    }
+    if(chapterBuffer.second.length()<=pagepart) return "chapterbuffer lenght error for chapter " +QString::number(chapter)+"\ndebug: page htmlsecondlength: " + QString::number(pagehtml.second.length()) + " - chlist length: " + QString::number(chlistlenght);
+    return chapterBuffer.second[pagepart];
+    */
 }
 int SpaceBattlesGet::GetChCount()
 {
