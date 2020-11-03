@@ -3,12 +3,12 @@
 #include <string>
 #include <sstream>
 #include <filesystem>
-#include "tidywrapper.h"
-#include "curlwrapper.h"
+#include "external/tidywrapper.h"
+#include "external/curlwrapper.h"
 #include "stringhelper.h"
 #include "royalroadget.h"
 #include "console.h"
-#include "zipwrapper.h"
+#include "external/zipwrapper.h"
 #include "makeepub.h"
 //using https://code.visualstudio.com/docs/cpp/config-mingw
 //

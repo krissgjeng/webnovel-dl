@@ -10,7 +10,10 @@ SET "files="
 
 ::mkdir build
 
-for %%f in (*.cpp) do (
+for %%f in (src\*.cpp) do (
+	SET files=!files! %%f
+)
+for %%f in (src\external\*.cpp) do (
 	SET files=!files! %%f
 )
 ::echo %files%

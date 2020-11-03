@@ -9,9 +9,13 @@ mkdir build
 #cd ..
 files=""
 
-for i in *.cpp; do
+for i in src/*.cpp; do
     files="$files $i"
 done
+for i in src/external/*.cpp; do
+    files="$files $i"
+done
+
 #echo $files
 #echo $Commandcpp -std=c++17 $files -I$MYINCLUDES -L$MYLIBF -l$MYLIBS -o main
 $Commandcpp -std=c++17 $MYLIBS $files -lstdc++fs -o main

@@ -3,7 +3,7 @@
 #define _GLIBCXX_HAS_GTHREADS
 #include <chrono>
 #include <thread>
-#include "curlwrapper.h"
+#include "external/curlwrapper.h"
 #include "stringhelper.h"
 #include "console.h"
 

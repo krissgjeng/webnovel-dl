@@ -1,7 +1,7 @@
 #include "makeepub.h"
 #include "royalroadget.h"
-#include "tidywrapper.h"
-#include "zipwrapper.h"
+#include "external/tidywrapper.h"
+#include "external/zipwrapper.h"
 #include "console.h"
 #include "stringhelper.h"
 #include <fstream>

@@ -4,7 +4,7 @@
 #ifdef __linux__
 #include <dirent.h>
 #else
-#include "dirent.h"
+#include "../windows/dirent.h"
 #endif
 #include <sys/stat.h>
 #include <errno.h>
