@@ -8,7 +8,7 @@ StringHelper::StringHelper()
 std::string StringHelper::Get(const std::string &source, const std::string &startstr, const std::string &endstr, bool inclusive)
 {
     int start = source.find(startstr);
-    int end = source.find(endstr, start+startstr.length()) - start;
+    int end = source.find(endstr, start + startstr.length()) - start;
     if (inclusive)
         end += endstr.length();
     return source.substr(start, end);
@@ -60,19 +60,20 @@ void StringHelper::replace(std::string &str, const std::string &from, const std:
     str.replace(start_pos, from.length(), to);
 }
 
-int StringHelper::GetNthIndex(std::string source, std::string substring, int nth)
+int StringHelper::GetNthIndex(const std::string &source, const std::string &substring, int nth)
 {
     int count = 0, n = 0;
 
-                if (substring != "")
-                {
-                    while ((n = source.find(substring, n)) != -1)
-                    {
-                        n += substring.length();
-                        ++count;
-                        if (count == nth) break;
-                    }
-                }
-                //Debug.WriteLine("getNthIndex: " + substring + "\nN: " + n + "\nCount: " + count);
-                return n;
+    if (substring != "")
+    {
+        while ((n = source.find(substring, n)) != -1)
+        {
+            n += substring.length();
+            ++count;
+            if (count == nth)
+                break;
+        }
+    }
+    //Debug.WriteLine("getNthIndex: " + substring + "\nN: " + n + "\nCount: " + count);
+    return n;
 }

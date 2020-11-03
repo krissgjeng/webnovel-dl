@@ -63,7 +63,10 @@ bool writeToFile(std::string &content, int mych=-1)
 
 int main(int argc, char *argv[]) 
 {
+    Console::Con() << "test";
     if(parseArgs(argc, argv)==false) return 1;
+
+    return 0;
     //std::cout << "Hello World!" << std::endl;
     //std::string url="https://www.royalroad.com/fiction/34473/shade-touched";
     std::string chp="";

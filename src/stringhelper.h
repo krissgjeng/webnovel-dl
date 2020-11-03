@@ -11,7 +11,7 @@ public:
     static std::vector<std::string> GetAll(std::string &source, const std::string &startstr, const std::string &endstr, bool inclusive=false);
     static void replaceAll(std::string& str, const std::string& from, const std::string& to);
     static void replace(std::string& str, const std::string& from, const std::string& to);
-    static int GetNthIndex(std::string source, std::string substring,int nth);
+    static int GetNthIndex(const std::string& source, const std::string &substring,int nth);
 private:
 
 };

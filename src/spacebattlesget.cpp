@@ -74,7 +74,7 @@ std::string SpaceBattlesGet::getCh(int ch)
     site = getChUrl(ch, site);
     string source = pagehtml.second;
 
-    int page = (ch - 1) / 10;
+    page = (ch - 1) / 10;
     int pagepart = (ch - 1) % 10;
     int chlistlenght = -1;
     if (chapterBuffer == pair<int, vector<string>>() || page != chapterBuffer.first)
