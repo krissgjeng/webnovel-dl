@@ -20,7 +20,8 @@ private:
     std::string getTitle(const std::string& source);
     std::string getChUrl(int ch, std::string url);
     std::string url;
-    std::vector<std::string> chapters;
     std::pair<int,std::string> pagehtml;
+    std::pair<int, std::vector<std::string>> chapterBuffer;
+    int chcount=-1;
 };
 #endif // SPACEBATTLESGET_H

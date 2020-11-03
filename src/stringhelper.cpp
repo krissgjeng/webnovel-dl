@@ -59,3 +59,20 @@ void StringHelper::replace(std::string &str, const std::string &from, const std:
     start_pos = str.find(from, start_pos);
     str.replace(start_pos, from.length(), to);
 }
+
+int StringHelper::GetNthIndex(std::string source, std::string substring, int nth)
+{
+    int count = 0, n = 0;
+
+                if (substring != "")
+                {
+                    while ((n = source.find(substring, n)) != -1)
+                    {
+                        n += substring.length();
+                        ++count;
+                        if (count == nth) break;
+                    }
+                }
+                //Debug.WriteLine("getNthIndex: " + substring + "\nN: " + n + "\nCount: " + count);
+                return n;
+}
