@@ -156,10 +156,12 @@ void MakeEpub::createToc()
     tocncx << toc;
     tocncx.close();
 }
+static std::string outfile="";
 void MakeEpub::compressContent()
 {
     using std::string;
     string output = outDir+"/"+ng->GetTitle()+"_"+std::to_string(chfrom)+"-"+std::to_string(chto)+".epub";
+    outfile = output;
     ZipWrapper zw;
 
     zw.zip_append_file_store(workDir+"/mimetype","mimetype",output);
@@ -168,7 +170,10 @@ void MakeEpub::compressContent()
 }
 void MakeEpub::cleanup()
 {
-    std::filesystem::remove_all(tmpDir);
-    std::filesystem::remove_all(workDir);
+    if(std::filesystem::exists(outfile))
+    {
+        std::filesystem::remove_all(tmpDir);
+        std::filesystem::remove_all(workDir);
+    }
     htmlfiles.clear();
 }

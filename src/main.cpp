@@ -96,8 +96,9 @@ int main(int argc, char *argv[])
     //Console::Con() << "test";
     if (parseArgs(argc, argv) == false)
         return 1;
+    Console::Con() << "chcount" << ng->GetChCount() << ", title: "<< ng->GetTitle() << ", author: "<<ng->GetAuthor()<<"\n";
 
-    //return 0;
+    return 0;
     std::cout << "Hello World!" << std::endl;
     //std::string url="https://www.royalroad.com/fiction/34473/shade-touched";
     std::string chp = "";
@@ -107,9 +108,9 @@ int main(int argc, char *argv[])
     switch (currentjob)
     {
     case job::getall:
-        ng->getAllCh([](int chi, std::string ch) {
-            writeToFile(ch, chi);
-        });
+        //ng->getAllCh([](int chi, std::string ch) {
+        //    writeToFile(ch, chi);
+        //});
         epub.BuildEpub(url);
         break;
     case job::getch:

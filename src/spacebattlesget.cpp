@@ -15,29 +15,26 @@ SpaceBattlesGet::SpaceBattlesGet(std::string url)
     this->url = url;
     //getChUrl(1); //inits stuff
 
-    //CurlWrapper curl;
-    //std::string source = curl.getSource(url);
-    //author = getAuthorSrc(source);
-    //title = getTitleSrc(source);
-    author="not impl";
-    title="not impl";
+    CurlWrapper curl;
+    std::string source = curl.getSource(url);
+    author = getAuthorSrc(source);
+    title = getTitleSrc(source);
 }
 
 std::string SpaceBattlesGet::getAuthorSrc(const std::string &source)
 {
     using std::string;
     StringHelper str;
-    string authsrc = str.Get(source, "<h4", "</h4>");
-    authsrc = str.Get(authsrc, "<a href=", "/a>");
-    authsrc = str.Get(authsrc, ">", "<");
-    return authsrc.substr(1);
+    string authsrc = str.Get(source, "data-xf-init=\"member-tooltip\">", "</a>");
+    str.replace(authsrc,"data-xf-init=\"member-tooltip\">","");
+    return authsrc;
 }
 std::string SpaceBattlesGet::getTitleSrc(const std::string &source)
 {
     using std::string;
     StringHelper str;
-    string titlesrc = str.Get(source, "<h1", "/h1>");
-    return str.Get(titlesrc, ">", "<").substr(1);
+    string titlesrc = str.Get(source, "<title>", "</title>");
+    return str.Get(titlesrc, ">", " |").substr(1);
 }
 
 std::string SpaceBattlesGet::getChUrl(int ch, std::string url)
@@ -99,14 +96,26 @@ int SpaceBattlesGet::GetChCount()
     {
         using std::string;
         CurlWrapper curl;
-        std::string sourcepage = curl.getSource(url);
+        string sourcepage = curl.getSource(url);
         int latest = -1;
-        int lastindex = sourcepage.find_last_of("<li class=\"pageNav-page");
+        string findnav = "li class=\"pageNav-page";
+        
+        int lastindex = sourcepage.rfind(findnav)-20;
+        string found = sourcepage.substr(lastindex);
+        //Console::Con() << "Found: " << found <<"\n";
         int endnumber = sourcepage.find("</a>", lastindex);
         string infostr = sourcepage.substr(lastindex, endnumber - lastindex);
+        //Console::Con() << "\nli:" << lastindex << " end: "<< endnumber << " max: " << sourcepage.size();
         string relstr = infostr.substr(infostr.find_last_of(">"));
+        //Console::Con() << "counts:" << relstr;
         StringHelper::replace(relstr, ">", "");
-        latest = std::stoi(relstr) * 10;
+        //latest = std::stoi(relstr) * 10;
+        string lastpage = this->url + (std::stoi(relstr) > 0 ? "page-" + relstr : "");
+        string lastsource = curl.getSource(lastpage);
+        auto chlist = StringHelper::GetAll(lastsource, "<article class=\"message-body js-selectToQuote\">", "</article>");
+
+        latest = ((std::stoi(relstr)-1) * 10) +chlist.size();
+
         chcount = latest;
     }
     return chcount;
