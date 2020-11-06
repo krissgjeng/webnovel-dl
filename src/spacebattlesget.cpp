@@ -4,6 +4,8 @@
 #include "console.h"
 #include <vector>
 #include <chrono>
+#include <iostream>
+#include <fstream>
 #define _GLIBCXX_HAS_GTHREADS
 #include <thread>
 
@@ -13,13 +15,15 @@ SpaceBattlesGet::SpaceBattlesGet(std::string url)
     this->url = url;
     //getChUrl(1); //inits stuff
 
-    CurlWrapper curl;
-    std::string source = curl.getSource(url);
-    Author = getAuthor(source);
-    Title = getTitle(source);
+    //CurlWrapper curl;
+    //std::string source = curl.getSource(url);
+    //author = getAuthorSrc(source);
+    //title = getTitleSrc(source);
+    author="not impl";
+    title="not impl";
 }
 
-std::string SpaceBattlesGet::getAuthor(const std::string &source)
+std::string SpaceBattlesGet::getAuthorSrc(const std::string &source)
 {
     using std::string;
     StringHelper str;
@@ -28,7 +32,7 @@ std::string SpaceBattlesGet::getAuthor(const std::string &source)
     authsrc = str.Get(authsrc, ">", "<");
     return authsrc.substr(1);
 }
-std::string SpaceBattlesGet::getTitle(const std::string &source)
+std::string SpaceBattlesGet::getTitleSrc(const std::string &source)
 {
     using std::string;
     StringHelper str;
@@ -44,7 +48,6 @@ std::string SpaceBattlesGet::getChUrl(int ch, std::string url)
 
     int page = ((ch - 1) / 10);
     int pagepart = ((ch - 1) % 10);
-
     if (pagepart == 1)
     {
         if ((pagehtml == pair<int, string>() || page != pagehtml.first) && page <= 1)
@@ -54,14 +57,13 @@ std::string SpaceBattlesGet::getChUrl(int ch, std::string url)
     if (pagehtml == pair<int, string>() || page != pagehtml.first)
         pagehtml = {page, curl.getSource(url)};
 
-    int indexstart = StringHelper::GetNthIndex(pagehtml.second, "<li id=\"post", pagepart + 1);
-    int indexend = pagehtml.second.find("\" ", indexstart);
-
+    /*int indexstart = StringHelper::GetNthIndex(pagehtml.second, "<article class=\"message-body", pagepart + 1);
+    int indexend = pagehtml.second.find("</article>", indexstart)+(sizeof("</article>")-1);
+    Console::Con() << "indexstart: " << indexstart << "\n";
     string relstring = pagehtml.second.substr(indexstart, indexend - indexstart);
-    StringHelper::replace(relstring, "<li id=\"", "");
     string newUrl = this->url + "#post" + relstring;
-    Console::WriteLine("new url: " + newUrl);
-    return newUrl;
+    Console::WriteLine("new url: " + newUrl);*/
+    return this->url;
 }
 std::string SpaceBattlesGet::getCh(int ch)
 {
@@ -70,7 +72,7 @@ std::string SpaceBattlesGet::getCh(int ch)
     StringHelper str;
 
     int page = (ch - 1) / 10;
-    string site = this->url + (page == 0 ? "" : "/page-" + std::to_string(page + 1));
+    string site = this->url + (page == 0 ? "" : "page-" + std::to_string(page + 1));
     site = getChUrl(ch, site);
     string source = pagehtml.second;
 

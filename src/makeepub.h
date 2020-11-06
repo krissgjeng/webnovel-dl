@@ -3,12 +3,12 @@
 #include <string>
 #include <vector>
 
-class RoyalRoadGet;
+class NovelGet;
 
 class MakeEpub
 {
 public:
-    MakeEpub(std::string outputdir="/pub");
+    MakeEpub(NovelGet* ng, std::string outputdir="/pub");
     void BuildEpub(std::string url);
 private:
     std::string outDir;
@@ -18,7 +18,7 @@ private:
     int chfrom;
     int chto;
     int chapters;
-    RoyalRoadGet* rrg=nullptr;
+    NovelGet* ng=nullptr;
     void prepareStructure();
     void downloadChapters(std::string url, int from=1, int to=-1);
     void convertToXhtml();

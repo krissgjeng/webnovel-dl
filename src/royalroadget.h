@@ -3,22 +3,26 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include "novelget.h"
 
-class RoyalRoadGet
+class RoyalRoadGet : public NovelGet
 {
 public:
     RoyalRoadGet(std::string url);
-    std::string getCh(int ch);
-    int GetChCount();
-    std::vector<std::string> getAllCh(std::function<void(int,std::string)> callback=[](int,std::string){},int delayinms=2000);
-
-    std::string Author;
-    std::string Title;
+    virtual std::string getCh(int ch);
+    virtual int GetChCount();
+    virtual std::vector<std::string> getAllCh(std::function<void(int,std::string)> callback=[](int,std::string){},int delayinms=2000);
+    //virtual std::string GetAuthor();
+    //virtual std::string GetTitle();
+protected:
+    virtual std::string getAuthorSrc(const std::string& source);
+    virtual std::string getTitleSrc(const std::string& source);
+    virtual std::string getChUrl(int ch);
+    //std::string url="";
+    //std::string title="";
+    //std::string author="";
+    
 private:
-    std::string getAuthor(const std::string& source);
-    std::string getTitle(const std::string& source);
-    std::string getChUrl(int ch);
-    std::string url;
     std::vector<std::string> chapters;
 };
 #endif // ROYALROADGET_H
