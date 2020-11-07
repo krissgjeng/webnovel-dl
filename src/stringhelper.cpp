@@ -1,5 +1,9 @@
 #include "stringhelper.h"
 #include "console.h"
+extern "C"
+{
+    #include "external/htmlentities.h"
+}
 
 StringHelper::StringHelper()
 {
@@ -76,4 +80,22 @@ int StringHelper::GetNthIndex(const std::string &source, const std::string &subs
     }
     //Debug.WriteLine("getNthIndex: " + substring + "\nN: " + n + "\nCount: " + count);
     return n;
+}
+void StringHelper::RemoveIllegalCharsInFsName(std::string& source)
+{
+    using std::string;
+    string illegalChars = "\\/:?\"<>|";
+    for (auto it = source.begin() ; it < source.end() ; ++it){
+        bool found = illegalChars.find(*it) != string::npos;
+        if(found){
+            *it = ' ';
+        }
+    }
+}
+std::string StringHelper::UnescapeHtmlEntities(const std::string& source)
+{
+    char buffer[32768]={};
+    htmlentities::decode_html_entities_utf8(buffer,source.c_str());
+    std::string decoded = buffer;
+    return decoded;
 }

@@ -29,6 +29,15 @@ void MakeEpub::BuildEpub(std::string url)
     compressContent();
     cleanup();
 }
+void MakeEpub::BuildEpub(std::string url, int from, int to)
+{
+    prepareStructure();
+    downloadChapters(url,from,to);
+    convertToXhtml();
+    createToc();
+    compressContent();
+    cleanup();
+}
 
 void MakeEpub::prepareStructure()
 {
@@ -45,7 +54,7 @@ void MakeEpub::downloadChapters(std::string url, int from, int to)
     int delayinms=750;
     int c = ng->GetChCount();
     Console::WriteLine("chps: "+std::to_string(c));
-    if(to==-1) to =c;
+    if(to==-1) to=c;
     chfrom = from; chto = to;
     chapters= chto - (from-1);
 
@@ -74,8 +83,8 @@ void MakeEpub::convertToXhtml()
         contentss << chh.rdbuf();
         chh.close();
         std::string xhtml = td.tidyhtmlToXHtml(contentss.str());
-        if(i==0) StringHelper::replace(xhtml, "<body>", "<body>\n<h1>"+ng->GetTitle()+"</h1>\n<h4>by "+ng->GetAuthor()+"</h4><h2>Chapter "+std::to_string(i+1)+"</h2><br />");
-        else StringHelper::replace(xhtml, "<body>", "<body>\n<h2>Chapter "+std::to_string(i+1)+"</h2><br />");
+        if(i==0) StringHelper::replace(xhtml, "<body>", "<body>\n<h1>"+ng->GetTitle()+"</h1>\n<h4>by "+ng->GetAuthor()+"</h4><h2>Chapter "+std::to_string(i+chfrom)+"</h2><br />");
+        else StringHelper::replace(xhtml, "<body>", "<body>\n<h2>Chapter "+std::to_string(i+chfrom)+"</h2><br />");
         chx << xhtml;
         chx.close();
     }
@@ -160,7 +169,10 @@ static std::string outfile="";
 void MakeEpub::compressContent()
 {
     using std::string;
-    string output = outDir+"/"+ng->GetTitle()+"_"+std::to_string(chfrom)+"-"+std::to_string(chto)+".epub";
+    string output = outDir+"/";
+    string filename = ng->GetTitle()+"_"+std::to_string(chfrom)+"-"+std::to_string(chto)+".epub";
+    StringHelper::RemoveIllegalCharsInFsName(filename);
+    output = output+filename;
     outfile = output;
     ZipWrapper zw;
 

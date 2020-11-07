@@ -12,6 +12,8 @@ public:
     static void replaceAll(std::string& str, const std::string& from, const std::string& to);
     static void replace(std::string& str, const std::string& from, const std::string& to);
     static int GetNthIndex(const std::string& source, const std::string &substring,int nth);
+    static void RemoveIllegalCharsInFsName(std::string& source);
+    static std::string UnescapeHtmlEntities(const std::string& source);
 private:
 
 };

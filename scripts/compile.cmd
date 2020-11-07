@@ -8,12 +8,15 @@ SET MYINCLUDES=-Ilib\libtidy\include -Ilib\libcurl\include -Ilib\libzip\lib
 
 SET "files="
 
-::mkdir build
+mkdir build
 
 for %%f in (src\*.cpp) do (
 	SET files=!files! %%f
 )
 for %%f in (src\external\*.cpp) do (
+	SET files=!files! %%f
+)
+for %%f in (src\external\*.c) do (
 	SET files=!files! %%f
 )
 ::echo %files%

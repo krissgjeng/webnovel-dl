@@ -108,3 +108,24 @@ std::string CurlWrapper::getSource(std::string url)
 
     return content;
 }
+
+std::string CurlWrapper::urlDecode(const std::string& string)
+{
+    CURL* curl_handle;
+    curl_global_init(CURL_GLOBAL_ALL);
+    curl_handle = curl_easy_init();
+    std::string decoded = curl_easy_unescape(curl_handle,string.c_str(),0,nullptr);
+    curl_easy_cleanup(curl_handle);
+    curl_global_cleanup();
+    return decoded;
+}
+std::string CurlWrapper::urlEncode(const std::string& string)
+{
+    CURL* curl_handle;
+    curl_global_init(CURL_GLOBAL_ALL);
+    curl_handle = curl_easy_init();
+    std::string encoded = curl_easy_escape(curl_handle,string.c_str(),0);
+    curl_easy_cleanup(curl_handle);
+    curl_global_cleanup();
+    return encoded;
+}

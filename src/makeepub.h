@@ -10,6 +10,7 @@ class MakeEpub
 public:
     MakeEpub(NovelGet* ng, std::string outputdir="/pub");
     void BuildEpub(std::string url);
+    void BuildEpub(std::string url, int from, int to=-1);
 private:
     std::string outDir;
     std::string workDir;

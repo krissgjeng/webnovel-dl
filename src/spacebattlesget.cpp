@@ -19,6 +19,7 @@ SpaceBattlesGet::SpaceBattlesGet(std::string url)
     std::string source = curl.getSource(url);
     author = getAuthorSrc(source);
     title = getTitleSrc(source);
+    Console::Con() << "spacebattles done\n";
 }
 
 std::string SpaceBattlesGet::getAuthorSrc(const std::string &source)
@@ -33,8 +34,12 @@ std::string SpaceBattlesGet::getTitleSrc(const std::string &source)
 {
     using std::string;
     StringHelper str;
+    CurlWrapper cw;
     string titlesrc = str.Get(source, "<title>", "</title>");
-    return str.Get(titlesrc, ">", " |").substr(1);
+    string title = str.Get(titlesrc, ">", " |").substr(1);
+    title = cw.urlDecode(title);
+    title = str.UnescapeHtmlEntities(title);
+    return title;
 }
 
 std::string SpaceBattlesGet::getChUrl(int ch, std::string url)

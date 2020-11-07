@@ -7,6 +7,8 @@ class CurlWrapper
 public:
     CurlWrapper();
     std::string getSource(std::string url);
+    std::string urlDecode(const std::string& string);
+    std::string urlEncode(const std::string& string);
 private:
 
 };

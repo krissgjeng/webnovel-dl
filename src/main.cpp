@@ -18,10 +18,13 @@
 //
 std::string url = "";
 int ch = 1;
+int chfrom = -1;
+int chto = -1;
 enum job
 {
     none,
     getch,
+    getchps,
     getall
 };
 job currentjob = none;
@@ -31,32 +34,48 @@ bool parseArgs(int argc, char *argv[])
 {
     if (argc <= 1)
     {
-        Console::WriteLine("no args, enter url and chapter, example .\\main.exe https://www.royalroad.com/fiction/34473/shade-touched 1");
+        Console::Con() << "usage: main.exe [url] [ch], Downloads one chapter, example .\\main.exe https://www.royalroad.com/fiction/34473/shade-touched 1\n"
+        << "usage 2: main.exe [url] [chapterrange], Downloads chapter range, example .\\main.exe https://www.royalroad.com/fiction/34473/shade-touched 2-30\n"
+        << "usage 3: main.exe [url], Downloads all chapter to epub, example: main https://forums.spacebattles.com/threads/the-last-angel-ascension.346640/reader/\n";
         currentjob = job::none;
         return false;
     }
     url = argv[1];
-    if (url.rfind("royalroad") !=std::string::npos)
+    if (url.rfind("royalroad") != std::string::npos)
     {
-        Console::Con() << "is royalroad";
-        ng = new RoyalRoadGet(url);
+        Console::Con() << "is royalroad\n";
+        try { ng = new RoyalRoadGet(url); } catch (const std::exception& e) { Console::Con() << e.what(); return false; }
+        
     }
-    else if (url.rfind("spacebattles") !=std::string::npos)
+    else if (url.rfind("spacebattles") != std::string::npos)
     {
-        Console::Con() << "is spacebattles";
-        ng = new SpaceBattlesGet(url);
+        Console::Con() << "is spacebattles\n";
+        try { ng = new SpaceBattlesGet(url); } catch (const std::exception& e) { Console::Con() << e.what(); return false; }
     }
     else
     {
-        Console::Con() << "url: " << url << " is not supported";
+        Console::Con() << "url: " << url << " is not supported\n";
         return false;
     }
     if (argc == 3)
     {
-        ch = std::stoi(argv[2]);
-        Console::WriteLine("url = " + url + " ch=" + std::to_string(ch));
-        currentjob = job::getch;
-        return true;
+        std::string argchps = argv[2];
+        int splitindex = -1;
+        if ((splitindex = argchps.find("-")) != std::string::npos)
+        {
+            chfrom = std::stoi(argchps.substr(0, splitindex));
+            chto = std::stoi(argchps.substr(splitindex + 1));
+            Console::Con() << "url=" << url << " from ch: " << chfrom << " to " << chto << "\n";
+            currentjob = job::getchps;
+            return true;
+        }
+        else
+        {
+            ch = std::stoi(argv[2]);
+            Console::WriteLine("url=" + url + " ch=" + std::to_string(ch));
+            currentjob = job::getch;
+            return true;
+        }
     }
     else if (argc == 2)
     {
@@ -96,10 +115,10 @@ int main(int argc, char *argv[])
     //Console::Con() << "test";
     if (parseArgs(argc, argv) == false)
         return 1;
-    Console::Con() << "chcount" << ng->GetChCount() << ", title: "<< ng->GetTitle() << ", author: "<<ng->GetAuthor()<<"\n";
+    //Console::Con() << "chcount" << ng->GetChCount() << ", title: "<< ng->GetTitle() << ", author: "<<ng->GetAuthor()<<"\n";
 
-    return 0;
-    std::cout << "Hello World!" << std::endl;
+    //return 0;
+    //std::cout << "Hello World!" << std::endl;
     //std::string url="https://www.royalroad.com/fiction/34473/shade-touched";
     std::string chp = "";
     //RoyalRoadGet rrg(url);
@@ -117,6 +136,9 @@ int main(int argc, char *argv[])
         chp = ng->getCh(ch);
         //std::cout << chp <<std::endl;
         writeToFile(chp, ch);
+        break;
+    case job::getchps:
+        epub.BuildEpub(url, chfrom, chto);
         break;
     default:
         break;
