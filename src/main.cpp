@@ -13,6 +13,8 @@
 #include "novelget.h"
 #include "royalroadget.h"
 #include "spacebattlesget.h"
+#include "fanfictionget.h"
+#include "qqget.h"
 
 //using https://code.visualstudio.com/docs/cpp/config-mingw
 //
@@ -35,7 +37,7 @@ bool parseArgs(int argc, char *argv[])
     if (argc <= 1)
     {
         Console::Con() << "usage: main.exe [url] [ch], Downloads one chapter, example .\\main.exe https://www.royalroad.com/fiction/34473/shade-touched 1\n"
-        << "usage 2: main.exe [url] [chapterrange], Downloads chapter range, example .\\main.exe https://www.royalroad.com/fiction/34473/shade-touched 2-30\n"
+        << "usage 2: main.exe [url] [chapterrange], Downloads chapter range, example .\\main.exe https://www.fanfiction.net/s/12388283 2-30\n"
         << "usage 3: main.exe [url], Downloads all chapter to epub, example: main https://forums.spacebattles.com/threads/the-last-angel-ascension.346640/reader/\n";
         currentjob = job::none;
         return false;
@@ -51,6 +53,17 @@ bool parseArgs(int argc, char *argv[])
     {
         Console::Con() << "is spacebattles\n";
         try { ng = new SpaceBattlesGet(url); } catch (const std::exception& e) { Console::Con() << e.what(); return false; }
+    }
+    else if (url.rfind("fanfiction.net") != std::string::npos)
+    {
+        Console::Con() << "is fanfiction.net\n";
+        try { ng = new FanFictionGet(url); } catch (const std::exception& e) { Console::Con() << e.what(); return false; }
+    }
+    else if (url.rfind("questionablequesting") != std::string::npos)
+    {
+        //url https://forum.questionablequesting.com/threads/with-this-ring-young-justice-si-story-only.8961/
+        Console::Con() << "is questionablequesting\n";
+        try { ng = new QuestionableQuestingGet(url); } catch (const std::exception& e) { Console::Con() << e.what(); return false; }
     }
     else
     {

@@ -12,6 +12,8 @@ public:
     virtual std::string getCh(int ch);
     virtual int GetChCount();
     virtual std::vector<std::string> getAllCh(std::function<void(int,std::string)> callback=[](int,std::string){},int delayinms=2000);
+    virtual void getAllCb(std::function<void(int,std::string)> callback=[](int,std::string){},int delayinms=1000);
+    virtual void getChaptersCb(int from, int to, std::function<void(int,std::string)> callback=[](int,std::string){},int delayinms=1000);
     //virtual std::string GetAuthor();
     //virtual std::string GetTitle();
 protected:

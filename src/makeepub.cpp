@@ -52,22 +52,20 @@ void MakeEpub::prepareStructure()
 void MakeEpub::downloadChapters(std::string url, int from, int to)
 {
     int delayinms=750;
-    int c = ng->GetChCount();
-    Console::WriteLine("chps: "+std::to_string(c));
-    if(to==-1) to=c;
+    int chapters = ng->GetChCount();
+    Console::WriteLine("chps: "+std::to_string(chapters));
+    if(to==-1) to=chapters;
     chfrom = from; chto = to;
     chapters= chto - (from-1);
 
-    for (size_t i = from; i <= to; i++)
-    {
+    ng->getChaptersCb(chfrom,chto,[this](int c, std::string chs){
         std::ofstream ch;
-        ch.open( tmpDir+"/"+std::to_string(i)+".html" );
-        htmlfiles.push_back(tmpDir+"/"+std::to_string(i)+".html");
-        ch << ng->getCh(i);
+        ch.open( tmpDir+"/"+std::to_string(c)+".html" );
+        htmlfiles.push_back(tmpDir+"/"+std::to_string(c)+".html");
+        ch << chs;
         ch.close();
-        Console::WriteLine("dl ch: "+std::to_string(i)+"/"+std::to_string(to));
-        std::this_thread::sleep_for(std::chrono::milliseconds(delayinms)); //delay for preventing flooding of server and getting banned
-    }
+        Console::WriteLine("dl ch: "+std::to_string(c)+"/"+std::to_string(chto));
+    },delayinms);
 }
 void MakeEpub::convertToXhtml()
 {
@@ -83,7 +81,7 @@ void MakeEpub::convertToXhtml()
         contentss << chh.rdbuf();
         chh.close();
         std::string xhtml = td.tidyhtmlToXHtml(contentss.str());
-        if(i==0) StringHelper::replace(xhtml, "<body>", "<body>\n<h1>"+ng->GetTitle()+"</h1>\n<h4>by "+ng->GetAuthor()+"</h4><h2>Chapter "+std::to_string(i+chfrom)+"</h2><br />");
+        if(i==0) StringHelper::replace(xhtml, "<body>", "<body>\n<h1>"+ng->GetTitle()+"</h1>\n<h3>by "+ng->GetAuthor()+"</h3><h4>src: <a href=\""+ng->url+"\">"+ng->url+"</a></h4><h2>Chapter "+std::to_string(i+chfrom)+"</h2><br />");
         else StringHelper::replace(xhtml, "<body>", "<body>\n<h2>Chapter "+std::to_string(i+chfrom)+"</h2><br />");
         chx << xhtml;
         chx.close();

@@ -1,4 +1,4 @@
-#include "spacebattlesget.h"
+#include "qqget.h"
 #include "external/curlwrapper.h"
 #include "stringhelper.h"
 #include "console.h"
@@ -10,7 +10,7 @@
 #include <thread>
 
 //not done
-SpaceBattlesGet::SpaceBattlesGet(std::string url)
+QuestionableQuestingGet::QuestionableQuestingGet(std::string url)
 {
     this->url = url;
     //getChUrl(1); //inits stuff
@@ -19,18 +19,18 @@ SpaceBattlesGet::SpaceBattlesGet(std::string url)
     std::string source = curl.getSource(url);
     author = getAuthorSrc(source);
     title = getTitleSrc(source);
-    Console::Con() << "spacebattles done\n";
+    getPageLength(source);
 }
 
-std::string SpaceBattlesGet::getAuthorSrc(const std::string &source)
+std::string QuestionableQuestingGet::getAuthorSrc(const std::string &source)
 {
     using std::string;
     StringHelper str;
-    string authsrc = str.Get(source, "data-xf-init=\"member-tooltip\">", "</a>");
-    str.replace(authsrc,"data-xf-init=\"member-tooltip\">","");
+    string authsrc = str.Get(source, "data-author=", "\">");
+    str.replace(authsrc,"data-author=\"","");
     return authsrc;
 }
-std::string SpaceBattlesGet::getTitleSrc(const std::string &source)
+std::string QuestionableQuestingGet::getTitleSrc(const std::string &source)
 {
     using std::string;
     StringHelper str;
@@ -42,14 +42,14 @@ std::string SpaceBattlesGet::getTitleSrc(const std::string &source)
     return title;
 }
 
-std::string SpaceBattlesGet::getChUrl(int ch, std::string url)
+std::string QuestionableQuestingGet::getChUrl(int ch, std::string url)
 {
     using std::string, std::pair;
     CurlWrapper curl;
     StringHelper str;
 
-    int page = ((ch - 1) / 10);
-    int pagepart = ((ch - 1) % 10);
+    int page = ((ch - 1) / pageLength);
+    int pagepart = ((ch - 1) % pageLength);
     if (pagepart == 1)
     {
         if ((pagehtml == pair<int, string>() || page != pagehtml.first) && page <= 1)
@@ -59,31 +59,33 @@ std::string SpaceBattlesGet::getChUrl(int ch, std::string url)
     if (pagehtml == pair<int, string>() || page != pagehtml.first)
         pagehtml = {page, curl.getSource(url)};
 
-    /*int indexstart = StringHelper::GetNthIndex(pagehtml.second, "<article class=\"message-body", pagepart + 1);
-    int indexend = pagehtml.second.find("</article>", indexstart)+(sizeof("</article>")-1);
-    Console::Con() << "indexstart: " << indexstart << "\n";
-    string relstring = pagehtml.second.substr(indexstart, indexend - indexstart);
-    string newUrl = this->url + "#post" + relstring;
-    Console::WriteLine("new url: " + newUrl);*/
     return this->url;
 }
-std::string SpaceBattlesGet::getCh(int ch)
+int QuestionableQuestingGet::getPageLength(std::string& source)
+{
+    if(pageLength>0)
+        return pageLength;
+    auto chlist = StringHelper::GetAll(source, "<article>", "</article>");
+    pageLength = chlist.size();
+    return pageLength;
+}
+std::string QuestionableQuestingGet::getCh(int ch)
 {
     using std::vector, std::string, std::pair;
     CurlWrapper curl;
     StringHelper str;
 
-    int page = (ch - 1) / 10;
+    int page = (ch - 1) / pageLength;
     string site = this->url + (page == 0 ? "" : "page-" + std::to_string(page + 1));
     site = getChUrl(ch, site);
     string source = pagehtml.second;
 
-    page = (ch - 1) / 10;
-    int pagepart = (ch - 1) % 10;
+    page = (ch - 1) / pageLength;
+    int pagepart = (ch - 1) % pageLength;
     int chlistlenght = -1;
     if (chapterBuffer == pair<int, vector<string>>() || page != chapterBuffer.first)
     {
-        auto chlist = StringHelper::GetAll(pagehtml.second, "<article class=\"message-body js-selectToQuote\">", "</article>");
+        auto chlist = StringHelper::GetAll(pagehtml.second, "<article>", "</article>");
         chlistlenght = chlist.size();
         Console::WriteLine("page htmlsecond_length: " + std::to_string(pagehtml.second.length()) + " - chlist length: " + std::to_string(chlist.size()));
         chapterBuffer = pair<int, vector<string>>(page, chlist);
@@ -96,37 +98,29 @@ std::string SpaceBattlesGet::getCh(int ch)
     }
     return chapterBuffer.second[pagepart];
 }
-int SpaceBattlesGet::GetChCount()
+int QuestionableQuestingGet::GetChCount()
 {
     if (chcount == -1)
     {
         using std::string;
         CurlWrapper curl;
+        StringHelper str;
         string sourcepage = curl.getSource(url);
         int latest = -1;
-        string findnav = "li class=\"pageNav-page";
-        
-        int lastindex = sourcepage.rfind(findnav)-20;
-        string found = sourcepage.substr(lastindex);
-        //Console::Con() << "Found: " << found <<"\n";
-        int endnumber = sourcepage.find("</a>", lastindex);
-        string infostr = sourcepage.substr(lastindex, endnumber - lastindex);
-        //Console::Con() << "\nli:" << lastindex << " end: "<< endnumber << " max: " << sourcepage.size();
-        string relstr = infostr.substr(infostr.find_last_of(">"));
-        //Console::Con() << "counts:" << relstr;
-        StringHelper::replace(relstr, ">", "");
-        //latest = std::stoi(relstr) * 10;
-        string lastpage = this->url + (std::stoi(relstr) > 0 ? "page-" + relstr : "");
+        string findnav = str.Get(sourcepage,"<span class=\"pageNavHeader","</span>",true);
+        findnav = str.Get(findnav,"Page 1 of","</span>");
+        int pages = std::stoi(findnav.substr(10));
+
+        string lastpage = this->url + (pages > 0 ? "page-" + std::to_string(pages) : "");
         string lastsource = curl.getSource(lastpage);
         auto chlist = StringHelper::GetAll(lastsource, "<article class=\"message-body js-selectToQuote\">", "</article>");
 
-        latest = ((std::stoi(relstr)-1) * 10) +chlist.size();
-
+        latest = ((pages-1) * pageLength) +chlist.size();
         chcount = latest;
     }
     return chcount;
 }
-std::vector<std::string> SpaceBattlesGet::getAllCh(std::function<void(int, std::string)> callback, int delayinms)
+std::vector<std::string> QuestionableQuestingGet::getAllCh(std::function<void(int, std::string)> callback, int delayinms)
 {
     using std::vector, std::string;
 
@@ -148,12 +142,13 @@ std::vector<std::string> SpaceBattlesGet::getAllCh(std::function<void(int, std::
 
     return allchapters;
 }
-void SpaceBattlesGet::getAllCb(std::function<void(int, std::string)> callback, int delayinms)
+
+void QuestionableQuestingGet::getAllCb(std::function<void(int, std::string)> callback, int delayinms)
 {
     int to = GetChCount();
     getChaptersCb(1,to,callback,delayinms);
 }
-void SpaceBattlesGet::getChaptersCb(int from, int to, std::function<void(int, std::string)> callback, int delayinms)
+void QuestionableQuestingGet::getChaptersCb(int from, int to, std::function<void(int, std::string)> callback, int delayinms)
 {
     using std::string;
 

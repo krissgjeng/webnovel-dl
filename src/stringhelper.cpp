@@ -1,5 +1,10 @@
 #include "stringhelper.h"
 #include "console.h"
+
+#include <algorithm>
+#include <cctype>
+#include <string>
+
 extern "C"
 {
     #include "external/htmlentities.h"
@@ -9,10 +14,30 @@ StringHelper::StringHelper()
 {
 }
 
-std::string StringHelper::Get(const std::string &source, const std::string &startstr, const std::string &endstr, bool inclusive)
+std::string StringHelper::ToLower(const std::string& source)
 {
+    std::string data = source;
+    std::transform(data.begin(), data.end(), data.begin(),
+    [](unsigned char c){ return std::tolower(c); });
+    return data; 
+}
+
+std::string StringHelper::Get(const std::string &sourceorg, const std::string &startstr, const std::string &endstr, bool inclusive, bool caseInsensitive)
+{
+    std::string source;
+    if(caseInsensitive)
+    {
+        source = ToLower(sourceorg);
+    }
+    else
+    {
+         source = sourceorg;
+    }
+    
+    
     int start = source.find(startstr);
     int end = source.find(endstr, start + startstr.length()) - start;
+    //Console::Con() << "start: "<<start <<" to end: " << end << " for "+startstr+" to "+endstr+"\n";
     if (inclusive)
         end += endstr.length();
     return source.substr(start, end);
@@ -80,6 +105,19 @@ int StringHelper::GetNthIndex(const std::string &source, const std::string &subs
     }
     //Debug.WriteLine("getNthIndex: " + substring + "\nN: " + n + "\nCount: " + count);
     return n;
+}
+int StringHelper::CountStr(const std::string& source, const std::string& strtofind)
+{
+    int count = 0, n = 0;
+    if (strtofind != "")
+    {
+        while ((n = source.find(strtofind, n)) != -1)
+        {
+            n += strtofind.length();
+            count++;
+        }
+    }
+    return count;
 }
 void StringHelper::RemoveIllegalCharsInFsName(std::string& source)
 {

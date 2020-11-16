@@ -1,4 +1,4 @@
-#include "royalroadget.h"
+#include "fanfictionget.h"
 #include <vector>
 #define _GLIBCXX_HAS_GTHREADS
 #include <chrono>
@@ -7,30 +7,33 @@
 #include "stringhelper.h"
 #include "console.h"
 
-RoyalRoadGet::RoyalRoadGet(std::string url)
+FanFictionGet::FanFictionGet(std::string url)
 {
+    //url should be https://www.fanfiction.net/s/12388283
     this->url = url;
     getChUrl(1); //inits stuff
 }
 
-std::string RoyalRoadGet::getAuthorSrc(const std::string& source)
+std::string FanFictionGet::getAuthorSrc(const std::string& source)
 {
     using std::string;
     StringHelper str;
-    string authsrc = str.Get(source, "<h4", "</h4>");
-    authsrc = str.Get(authsrc,"<a href=","/a>");
-    authsrc = str.Get(authsrc,">","<");
-    return authsrc.substr(1);
+    string authsrc = str.Get(source, "By:", "</a>");
+    int fi = authsrc.find("'>");
+    authsrc = authsrc.substr(fi);
+    return authsrc.substr(2);
 }
-std::string RoyalRoadGet::getTitleSrc(const std::string& source)
+std::string FanFictionGet::getTitleSrc(const std::string& source)
 {
     using std::string;
     StringHelper str;
-    string titlesrc = str.Get(source, "<h1", "/h1>");
-    return str.Get(titlesrc, ">","<").substr(1);
+    string titlesrc = str.Get(source, "<title>", "</title>");
+    titlesrc= str.Get(titlesrc, ">"," | FanFiction");
+    str.replace(titlesrc," Chapter 1","");
+    return titlesrc.substr(1);
 }
 
-std::string RoyalRoadGet::getChUrl(int ch)
+std::string FanFictionGet::getChUrl(int ch)
 {
     using std::vector, std::string;
     if (chapters.size() < 1)
@@ -41,13 +44,11 @@ std::string RoyalRoadGet::getChUrl(int ch)
         string source = curl.getSource(url);
         author = getAuthorSrc(source);
         title = getTitleSrc(source);
-        string chaps = str.Get(source, "<tbody>", "</tbody>");
-
-        chapters = str.GetAll(chaps, "href", "\">");
-        for (int i = 0; i < chapters.size(); i++)
+        string chaps = str.Get(source, "<select", "</select>",false,true);
+        int chcount =str.CountStr(chaps, "<option");
+        for (int i = 1; i <= chcount; i++)
         {
-            str.replaceAll(chapters[i], "href=\"", "https://www.royalroad.com");
-            //Console::WriteLine(a[i]);
+            chapters.push_back(url+"/"+std::to_string(i));
         }
     }
     if(ch-1<=chapters.size())
@@ -55,7 +56,7 @@ std::string RoyalRoadGet::getChUrl(int ch)
     else 
         return "";
 }
-std::string RoyalRoadGet::getCh(int ch)
+std::string FanFictionGet::getCh(int ch)
 {
     using std::vector, std::string;
     CurlWrapper curl;
@@ -65,17 +66,17 @@ std::string RoyalRoadGet::getCh(int ch)
     {
             auto chsrc = curl.getSource(churl);
             //return chsrc = curl.getSource(chapters[ch-1]);
-            return str.Get(chsrc, "<div class=\"chapter-inner", "<h6 class");
+            return str.Get(chsrc, "<div role", "</div>")+"</div></div>";
     }
     else 
         return "";
 }
-int RoyalRoadGet::GetChCount()
+int FanFictionGet::GetChCount()
 {
     getChUrl(1);
     return chapters.size();
 }
-std::vector<std::string> RoyalRoadGet::getAllCh(std::function<void(int,std::string)> callback, int delayinms)
+std::vector<std::string> FanFictionGet::getAllCh(std::function<void(int,std::string)> callback, int delayinms)
 {
     using std::vector, std::string;
 
@@ -93,12 +94,12 @@ std::vector<std::string> RoyalRoadGet::getAllCh(std::function<void(int,std::stri
 
     return allchapters;
 }
-void RoyalRoadGet::getAllCb(std::function<void(int, std::string)> callback, int delayinms)
+void FanFictionGet::getAllCb(std::function<void(int, std::string)> callback, int delayinms)
 {
     int to = GetChCount();
     getChaptersCb(1,to,callback,delayinms);
 }
-void RoyalRoadGet::getChaptersCb(int from, int to, std::function<void(int, std::string)> callback, int delayinms)
+void FanFictionGet::getChaptersCb(int from, int to, std::function<void(int, std::string)> callback, int delayinms)
 {
     using std::string;
 
