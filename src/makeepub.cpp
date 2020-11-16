@@ -60,6 +60,8 @@ void MakeEpub::downloadChapters(std::string url, int from, int to)
 
     ng->getChaptersCb(chfrom,chto,[this](int c, std::string chs){
         std::ofstream ch;
+        if(c==1) chs ="<h1>"+ng->GetTitle()+"</h1>\n<h3>by "+ng->GetAuthor()+"</h3><h4>src: <a href=\""+ng->url+"\">"+ng->url+"</a></h4><h2>Chapter "+std::to_string(c)+"</h2><br />"+chs;
+        else chs = "<h2>Chapter "+std::to_string(c)+"</h2><br />"+chs;
         ch.open( tmpDir+"/"+std::to_string(c)+".html" );
         htmlfiles.push_back(tmpDir+"/"+std::to_string(c)+".html");
         ch << chs;
@@ -81,8 +83,8 @@ void MakeEpub::convertToXhtml()
         contentss << chh.rdbuf();
         chh.close();
         std::string xhtml = td.tidyhtmlToXHtml(contentss.str());
-        if(i==0) StringHelper::replace(xhtml, "<body>", "<body>\n<h1>"+ng->GetTitle()+"</h1>\n<h3>by "+ng->GetAuthor()+"</h3><h4>src: <a href=\""+ng->url+"\">"+ng->url+"</a></h4><h2>Chapter "+std::to_string(i+chfrom)+"</h2><br />");
-        else StringHelper::replace(xhtml, "<body>", "<body>\n<h2>Chapter "+std::to_string(i+chfrom)+"</h2><br />");
+        //if(i==0) StringHelper::replace(xhtml, "<body>", "<body>\n<h1>"+ng->GetTitle()+"</h1>\n<h3>by "+ng->GetAuthor()+"</h3><h4>src: <a href=\""+ng->url+"\">"+ng->url+"</a></h4><h2>Chapter "+std::to_string(i+chfrom)+"</h2><br />");
+        //else StringHelper::replace(xhtml, "<body>", "<body>\n<h2>Chapter "+std::to_string(i+chfrom)+"</h2><br />");
         chx << xhtml;
         chx.close();
     }
@@ -167,8 +169,10 @@ static std::string outfile="";
 void MakeEpub::compressContent()
 {
     using std::string;
+    StringHelper str;
     string output = outDir+"/";
-    string filename = ng->GetTitle()+"_"+std::to_string(chfrom)+"-"+std::to_string(chto)+".epub";
+    string title =  str.UnescapeHtmlEntities(ng->GetTitle());
+    string filename = title+"_"+std::to_string(chfrom)+"-"+std::to_string(chto)+".epub";
     StringHelper::RemoveIllegalCharsInFsName(filename);
     output = output+filename;
     outfile = output;

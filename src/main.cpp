@@ -15,6 +15,7 @@
 #include "spacebattlesget.h"
 #include "fanfictionget.h"
 #include "qqget.h"
+#include "sufficientvelocityget.h"
 
 //using https://code.visualstudio.com/docs/cpp/config-mingw
 //
@@ -53,6 +54,11 @@ bool parseArgs(int argc, char *argv[])
     {
         Console::Con() << "is spacebattles\n";
         try { ng = new SpaceBattlesGet(url); } catch (const std::exception& e) { Console::Con() << e.what(); return false; }
+    }
+    else if (url.rfind("sufficientvelocity") != std::string::npos)
+    {
+        Console::Con() << "is sufficientvelocity\n";
+        try { ng = new SufficientVelocityGet(url); } catch (const std::exception& e) { Console::Con() << e.what(); return false; }
     }
     else if (url.rfind("fanfiction.net") != std::string::npos)
     {
