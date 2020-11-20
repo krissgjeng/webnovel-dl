@@ -16,6 +16,7 @@
 #include "fanfictionget.h"
 #include "qqget.h"
 #include "sufficientvelocityget.h"
+#include "ao3get.h"
 
 //using https://code.visualstudio.com/docs/cpp/config-mingw
 //
@@ -64,6 +65,12 @@ bool parseArgs(int argc, char *argv[])
     {
         Console::Con() << "is fanfiction.net\n";
         try { ng = new FanFictionGet(url); } catch (const std::exception& e) { Console::Con() << e.what(); return false; }
+    }
+    else if (url.rfind("archiveofourown") != std::string::npos)
+    {
+        //https://archiveofourown.org/works/4833515
+        Console::Con() << "is archiveofourown\n";
+        try { ng = new AO3Get(url); } catch (const std::exception& e) { Console::Con() << e.what(); return false; }
     }
     else if (url.rfind("questionablequesting") != std::string::npos)
     {
