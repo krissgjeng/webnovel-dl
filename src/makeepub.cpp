@@ -52,11 +52,11 @@ void MakeEpub::prepareStructure()
 void MakeEpub::downloadChapters(std::string url, int from, int to)
 {
     int delayinms=750;
-    int chapters = ng->GetChCount();
-    Console::WriteLine("chps: "+std::to_string(chapters));
+    chapters = ng->GetChCount();
     if(to==-1) to=chapters;
     chfrom = from; chto = to;
     chapters= chto - (from-1);
+    Console::WriteLine("chps: "+std::to_string(chapters));
 
     ng->getChaptersCb(chfrom,chto,[this](int c, std::string chs){
         std::ofstream ch;
